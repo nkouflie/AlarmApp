@@ -3,7 +3,8 @@ import AlarmKit
 
 struct AlarmForm {
     
-    var label = ""
+    // Default alarm name is "Alarm" - user can edit immediately
+    var label = "Alarm"
     
     var selectedDate = Date.now
     var selectedDays = Set<Locale.Weekday>()

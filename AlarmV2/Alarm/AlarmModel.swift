@@ -37,9 +37,12 @@ import AppIntents
     }
     
     func scheduleAlarm(with userInput: AlarmForm) {
-        let attributes = AlarmAttributes(presentation: alarmPresentation(with: userInput),
-                                         metadata: AlarmData(),
-                                         tintColor: Color.accentColor)
+        // Professional alarm presentation with optimal banner configuration
+        let attributes = AlarmAttributes(
+            presentation: alarmPresentation(with: userInput),
+            metadata: AlarmData(),
+            tintColor: .orange  // Warm, attention-getting but not aggressive
+        )
         
         let id = UUID()
         
@@ -59,35 +62,23 @@ import AppIntents
             let now = Date.now
             let calendar = Calendar.current
             
-            print("🔔 Scheduling alarm:")
-            print("   Raw selected date: \(selectedDate)")
-            print("   Current time: \(now)")
-            print("   Timezone: \(calendar.timeZone.identifier)")
-            
-            // Get ALL components from selected date in LOCAL timezone
-            // This interprets the date picker's time as local time, not UTC
-            let selectedComponents = calendar.dateComponents(in: calendar.timeZone, from: selectedDate)
-            
-            print("   📅 Selected components: year=\(selectedComponents.year ?? -1), month=\(selectedComponents.month ?? -1), day=\(selectedComponents.day ?? -1), hour=\(selectedComponents.hour ?? -1), minute=\(selectedComponents.minute ?? -1)")
+            // Extract time components from selected date (IGNORE seconds)
+            let timeComponents = calendar.dateComponents([.hour, .minute], from: selectedDate)
             
             // Create target date with today's date but selected time (seconds = 0)
             var targetComponents = calendar.dateComponents([.year, .month, .day], from: now)
-            targetComponents.hour = selectedComponents.hour
-            targetComponents.minute = selectedComponents.minute
+            targetComponents.hour = timeComponents.hour
+            targetComponents.minute = timeComponents.minute
             targetComponents.second = 0  // Always set seconds to 0 for precise minute-based alarms
+            targetComponents.timeZone = calendar.timeZone  // Ensure we use local timezone
             
             guard var targetDate = calendar.date(from: targetComponents) else {
-                print("❌ Failed to create target date")
                 return
             }
-            
-            print("   📍 Target components: year=\(targetComponents.year ?? -1), month=\(targetComponents.month ?? -1), day=\(targetComponents.day ?? -1), hour=\(targetComponents.hour ?? -1), minute=\(targetComponents.minute ?? -1)")
-            print("   📍 Created target: \(targetDate)")
             
             // If the time has already passed today, schedule for tomorrow
             if targetDate <= now {
                 targetDate = calendar.date(byAdding: .day, value: 1, to: targetDate) ?? targetDate
-                print("   ⏭️ Time already passed, scheduling for tomorrow")
             }
             
             print("   🎯 Final target date: \(targetDate)")
@@ -139,13 +130,19 @@ import AppIntents
             default: nil
         }
         
-        let alertContent = AlarmPresentation.Alert(title: userInput.localizedLabel,
-                                                   stopButton: .stopButton,
-                                                   secondaryButton: secondaryButton,
-                                                   secondaryButtonBehavior: secondaryButtonBehavior)
+        // Professional banner content optimized for system Live Activity presentation
+        // Title, buttons, and icons are carefully chosen for clarity and polish
+        let alertContent = AlarmPresentation.Alert(
+            title: userInput.localizedLabel,      // Clean alarm name
+            stopButton: .stopButton,              // Primary dismiss action
+            secondaryButton: secondaryButton,     // Optional secondary action (Snooze/Open)
+            secondaryButtonBehavior: secondaryButtonBehavior
+        )
         
-        // All alarms now use schedule-based configuration (fixed or relative)
-        // Only provide alert presentation (no countdown/paused UI)
+        // System will display this in:
+        // - Dynamic Island (iPhone 14 Pro+)
+        // - Lock Screen banner
+        // - Top notification banner
         return AlarmPresentation(alert: alertContent)
     }
     
@@ -207,24 +204,54 @@ import AppIntents
 }
 
 extension AlarmButton {
+    // MARK: - Professional Alarm Banner Button Configurations
+    // These buttons appear in the system Live Activity banner when alarms alert
+    // Icons and text are optimized for clarity, professionalism, and iOS consistency
+    
+    /// Secondary action - Opens the app when tapped
     static var openAppButton: Self {
-        AlarmButton(text: "Open", textColor: .black, systemImageName: "swift")
+        AlarmButton(
+            text: "Open",
+            textColor: .black,
+            systemImageName: "app.badge"
+        )
     }
     
+    /// Countdown control - Pauses active timer
     static var pauseButton: Self {
-        AlarmButton(text: "Pause", textColor: .black, systemImageName: "pause.fill")
+        AlarmButton(
+            text: "Pause",
+            textColor: .black,
+            systemImageName: "pause.fill"
+        )
     }
     
+    /// Countdown control - Resumes paused timer
     static var resumeButton: Self {
-        AlarmButton(text: "Start", textColor: .black, systemImageName: "play.fill")
+        AlarmButton(
+            text: "Resume",
+            textColor: .black,
+            systemImageName: "play.fill"
+        )
     }
     
+    /// Secondary action - Snoozes alarm for later
     static var repeatButton: Self {
-        AlarmButton(text: "Repeat", textColor: .black, systemImageName: "repeat.circle")
+        AlarmButton(
+            text: "Snooze",
+            textColor: .black,
+            systemImageName: "clock.badge"
+        )
     }
     
+    /// Primary action - Dismisses alarm immediately
+    /// White text on orange tint creates strong visual priority
     static var stopButton: Self {
-        AlarmButton(text: "Done", textColor: .white, systemImageName: "stop.circle")
+        AlarmButton(
+            text: "OK",
+            textColor: .white,
+            systemImageName: "checkmark.circle.fill"
+        )
     }
 }
 
