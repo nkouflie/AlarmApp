@@ -8,14 +8,23 @@ import AppIntents
     typealias AlarmsMap = [UUID: (Alarm, LocalizedStringResource)]
     
     @MainActor var alarmsMap = AlarmsMap()
-    @ObservationIgnored private let alarmManager = AlarmManager.shared
+    @ObservationIgnored private var alarmManager: AlarmManager {
+        AlarmManager.shared
+    }
     
     @MainActor var hasAlarms: Bool {
         !alarmsMap.isEmpty
     }
     
     init() {
-        observeAlarms()
+        Task {
+            do {
+                try await Task.sleep(for: .milliseconds(100))
+                observeAlarms()
+            } catch {
+                print("Error in init: \(error)")
+            }
+        }
     }
     
     func fetchAlarms() {
@@ -39,29 +48,56 @@ import AppIntents
         if let schedule = userInput.schedule {
             // Schedule-based alarm
             alarmConfiguration = AlarmConfiguration(
-                countdownDuration: nil,
+                schedule: schedule,
                 attributes: attributes,
                 stopIntent: StopIntent(alarmID: id.uuidString),
                 secondaryIntent: secondaryIntent(alarmID: id, userInput: userInput)
             )
         } else {
-            // Countdown-based alarm (if no schedule)
-            // Use the selected time from the date picker to calculate countdown duration
+            // Fixed schedule alarm for precise timing
+            let selectedDate = userInput.selectedDate
             let now = Date.now
-            let selectedTime = userInput.selectedDate
+            let calendar = Calendar.current
             
-            // Calculate the difference in seconds
-            let countdownSeconds = selectedTime.timeIntervalSince(now)
+            print("🔔 Scheduling alarm:")
+            print("   Raw selected date: \(selectedDate)")
+            print("   Current time: \(now)")
+            print("   Timezone: \(calendar.timeZone.identifier)")
             
-            // Use a minimum of 1 second countdown
-            let duration = max(1, countdownSeconds)
+            // Get ALL components from selected date in LOCAL timezone
+            // This interprets the date picker's time as local time, not UTC
+            let selectedComponents = calendar.dateComponents(in: calendar.timeZone, from: selectedDate)
             
-            let countdownDuration = Alarm.CountdownDuration(
-                preAlert: duration,
-                postAlert: nil
-            )
+            print("   📅 Selected components: year=\(selectedComponents.year ?? -1), month=\(selectedComponents.month ?? -1), day=\(selectedComponents.day ?? -1), hour=\(selectedComponents.hour ?? -1), minute=\(selectedComponents.minute ?? -1)")
+            
+            // Create target date with today's date but selected time (seconds = 0)
+            var targetComponents = calendar.dateComponents([.year, .month, .day], from: now)
+            targetComponents.hour = selectedComponents.hour
+            targetComponents.minute = selectedComponents.minute
+            targetComponents.second = 0  // Always set seconds to 0 for precise minute-based alarms
+            
+            guard var targetDate = calendar.date(from: targetComponents) else {
+                print("❌ Failed to create target date")
+                return
+            }
+            
+            print("   📍 Target components: year=\(targetComponents.year ?? -1), month=\(targetComponents.month ?? -1), day=\(targetComponents.day ?? -1), hour=\(targetComponents.hour ?? -1), minute=\(targetComponents.minute ?? -1)")
+            print("   📍 Created target: \(targetDate)")
+            
+            // If the time has already passed today, schedule for tomorrow
+            if targetDate <= now {
+                targetDate = calendar.date(byAdding: .day, value: 1, to: targetDate) ?? targetDate
+                print("   ⏭️ Time already passed, scheduling for tomorrow")
+            }
+            
+            print("   🎯 Final target date: \(targetDate)")
+            print("   ⏱️ Will fire in: \(targetDate.timeIntervalSince(now)) seconds")
+            
+            // Use fixed date schedule
+            let fixedSchedule = Alarm.Schedule.fixed(targetDate)
+            
             alarmConfiguration = AlarmConfiguration(
-                countdownDuration: countdownDuration,
+                schedule: fixedSchedule,
                 attributes: attributes,
                 stopIntent: StopIntent(alarmID: id.uuidString),
                 secondaryIntent: secondaryIntent(alarmID: id, userInput: userInput)
@@ -78,7 +114,7 @@ import AppIntents
                     print("Not authorized to schedule alarms.")
                     return
                 }
-            let alarm = try await alarmManager.schedule(id: id, configuration: alarmConfiguration)
+                let alarm = try await alarmManager.schedule(id: id, configuration: alarmConfiguration)
                 await MainActor.run {
                     alarmsMap[id] = (alarm, label)
                 }
@@ -108,20 +144,9 @@ import AppIntents
                                                    secondaryButton: secondaryButton,
                                                    secondaryButtonBehavior: secondaryButtonBehavior)
         
-        // Only include countdown and paused presentations when schedule is disabled (i.e., it's a timer)
-        if userInput.scheduleEnabled {
-            // For scheduled alarms, only provide alert presentation
-            return AlarmPresentation(alert: alertContent)
-        } else {
-            // For countdown timers, provide all three presentations
-            let countdownContent = AlarmPresentation.Countdown(title: userInput.localizedLabel,
-                                                               pauseButton: .pauseButton)
-            
-            let pausedContent = AlarmPresentation.Paused(title: "Paused",
-                                                         resumeButton: .resumeButton)
-            
-            return AlarmPresentation(alert: alertContent, countdown: countdownContent, paused: pausedContent)
-        }
+        // All alarms now use schedule-based configuration (fixed or relative)
+        // Only provide alert presentation (no countdown/paused UI)
+        return AlarmPresentation(alert: alertContent)
     }
     
     private func secondaryIntent(alarmID: UUID, userInput: AlarmForm) -> (any LiveActivityIntent)? {
