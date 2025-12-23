@@ -6,13 +6,39 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXCopyFilesBuildPhase section */
+		1A7507B62EFA3B6B00E7F5C1 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		1A4A226C2EFA15850042BF07 /* AlarmV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlarmV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A7508152EFA46DE00E7F5C1 /* AlarmV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = AlarmV2.app; path = "/Users/nkouflie/dev/AlarmV2/build/Debug-iphoneos/AlarmV2.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1A7507C72EFA425900E7F5C1 /* Exceptions for "AlarmV2" folder in "AlarmV2" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1A4A226B2EFA15850042BF07 /* AlarmV2 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1A4A226E2EFA15850042BF07 /* AlarmV2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1A7507C72EFA425900E7F5C1 /* Exceptions for "AlarmV2" folder in "AlarmV2" target */,
+			);
 			path = AlarmV2;
 			sourceTree = "<group>";
 		};
@@ -33,16 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				1A4A226E2EFA15850042BF07 /* AlarmV2 */,
-				1A4A226D2EFA15850042BF07 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		1A4A226D2EFA15850042BF07 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				1A4A226C2EFA15850042BF07 /* AlarmV2.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,6 +72,7 @@
 				1A4A22682EFA15850042BF07 /* Sources */,
 				1A4A22692EFA15850042BF07 /* Frameworks */,
 				1A4A226A2EFA15850042BF07 /* Resources */,
+				1A7507B62EFA3B6B00E7F5C1 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -67,7 +85,7 @@
 			packageProductDependencies = (
 			);
 			productName = AlarmV2;
-			productReference = 1A4A226C2EFA15850042BF07 /* AlarmV2.app */;
+			productReference = 1A7508152EFA46DE00E7F5C1 /* AlarmV2.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +113,7 @@
 			mainGroup = 1A4A22632EFA15850042BF07;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 1A4A226D2EFA15850042BF07 /* Products */;
+			productRefGroup = 1A4A22632EFA15850042BF07;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -177,6 +195,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -234,6 +254,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -251,8 +273,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SQJC47UGK3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AlarmV2/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -282,8 +306,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SQJC47UGK3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AlarmV2/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
